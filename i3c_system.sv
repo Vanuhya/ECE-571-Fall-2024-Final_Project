@@ -1,4 +1,5 @@
-// This is the first version of the top level system I3C bus.The port connections are not matching and some control signals in the i3c_system module have to be added and integrated properly//
+// This is the first version of the top level system I3C bus.The port connections are not matching 
+//some control signals in the i3c_system module have to be added and integrated properly.
 module i3c_system (
     input  logic        clk,           // System clock
     input  logic        reset_n        // Active-low reset
