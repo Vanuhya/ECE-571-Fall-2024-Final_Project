@@ -1,0 +1,15 @@
+/u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/Test1/i3c_primary_master.sv {1 {vlog -work work -vopt -sv -stats=none /u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/Test1/i3c_primary_master.sv
+QuestaSim-64 vlog 2021.3_1 Compiler 2021.08 Aug 15 2021
+-- Compiling module i3c_primary_master
+
+Top level modules:
+	i3c_primary_master
+
+} {} {}} /u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/Test1/i3c_tb_primary.sv {1 {vlog -work work -vopt -sv -stats=none /u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/Test1/i3c_tb_primary.sv
+QuestaSim-64 vlog 2021.3_1 Compiler 2021.08 Aug 15 2021
+-- Compiling module i3c_tb_primary
+
+Top level modules:
+	i3c_tb_primary
+
+} {} {}}

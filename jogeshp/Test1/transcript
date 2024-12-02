@@ -1,0 +1,145 @@
+# //  Questa Sim-64
+# //  Version 2021.3_1 linux_x86_64 Aug 15 2021
+# //
+# //  Copyright 1991-2021 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# vsim gui 
+# Start time: 15:02:16 on Dec 01,2024
+# ** Error (suppressible): (vsim-19) Failed to access library 'work' at "work".
+# No such file or directory. (errno = ENOENT)
+# Error loading design
+# End time: 15:02:16 on Dec 01,2024, Elapsed time: 0:00:00
+# Errors: 1, Warnings: 0
+# Loading project final
+# Compile of i3c_primary_master.sv was successful.
+# Compile of i3c_tb_primary.sv was successful.
+# 2 compiles, 0 failed with no errors.
+vsim -voptargs=+acc work.i3c_tb_primary
+# vsim -voptargs="+acc" work.i3c_tb_primary 
+# Start time: 15:03:04 on Dec 01,2024
+# ** Note: (vsim-3812) Design is being optimized...
+# ** Note: (vopt-143) Recognized 1 FSM in module "i3c_primary_master(fast)".
+# Loading sv_std.std
+# Loading work.i3c_tb_primary(fast)
+# Loading work.i3c_primary_master(fast)
+run -all
+# Transaction: Data=4c, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=98, Error Inject=1, Arbitration=0, IBI=1
+# Transaction: Data=43, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=62, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=6b, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=3c, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=08, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=80, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=e5, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=85, Error Inject=0, Arbitration=1, IBI=0
+# Transaction: Data=6b, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=94, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=7b, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=a0, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=f9, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=5d, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=30, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=1c, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=2d, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=b5, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=83, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=e0, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=45, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=b9, Error Inject=0, Arbitration=1, IBI=0
+# Transaction: Data=da, Error Inject=0, Arbitration=0, IBI=1
+# Transaction: Data=52, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=44, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=4a, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=d4, Error Inject=0, Arbitration=1, IBI=0
+# Transaction: Data=55, Error Inject=0, Arbitration=1, IBI=0
+# Transaction: Data=cb, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=a1, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=a4, Error Inject=0, Arbitration=1, IBI=0
+# Transaction: Data=ec, Error Inject=0, Arbitration=1, IBI=0
+# Transaction: Data=f9, Error Inject=1, Arbitration=1, IBI=0
+# Transaction: Data=f9, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=12, Error Inject=0, Arbitration=1, IBI=0
+# Transaction: Data=c9, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=fe, Error Inject=0, Arbitration=1, IBI=0
+# Transaction: Data=0f, Error Inject=0, Arbitration=1, IBI=0
+# Transaction: Data=bd, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=da, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=3e, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=0c, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=f7, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=87, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=ef, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=44, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=1a, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=36, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=53, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=90, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=41, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=2c, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=5a, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=f5, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=2f, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=7f, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=49, Error Inject=0, Arbitration=1, IBI=0
+# Transaction: Data=44, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=91, Error Inject=1, Arbitration=1, IBI=0
+# Transaction: Data=1f, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=0b, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=fb, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=f9, Error Inject=0, Arbitration=1, IBI=0
+# Transaction: Data=ba, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=ef, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=2e, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=b0, Error Inject=1, Arbitration=1, IBI=0
+# Transaction: Data=5b, Error Inject=0, Arbitration=1, IBI=0
+# Transaction: Data=df, Error Inject=1, Arbitration=0, IBI=1
+# Transaction: Data=6e, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=67, Error Inject=0, Arbitration=1, IBI=0
+# Transaction: Data=d0, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=ed, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=6f, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=18, Error Inject=0, Arbitration=1, IBI=0
+# Transaction: Data=d4, Error Inject=0, Arbitration=1, IBI=0
+# Transaction: Data=12, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=9d, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=c6, Error Inject=0, Arbitration=0, IBI=1
+# Transaction: Data=4d, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=04, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=b8, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=6e, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=09, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=47, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=8e, Error Inject=1, Arbitration=1, IBI=0
+# Transaction: Data=c3, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=35, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=bc, Error Inject=0, Arbitration=0, IBI=1
+# Transaction: Data=15, Error Inject=0, Arbitration=1, IBI=0
+# Transaction: Data=20, Error Inject=0, Arbitration=0, IBI=1
+# Transaction: Data=f6, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=82, Error Inject=0, Arbitration=0, IBI=0
+# Transaction: Data=d7, Error Inject=1, Arbitration=1, IBI=0
+# Transaction: Data=14, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=79, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=7d, Error Inject=1, Arbitration=0, IBI=0
+# Transaction: Data=ab, Error Inject=0, Arbitration=1, IBI=0
+# Coverage Results:
+# Arbitration: 100.00%
+# Error Recovery: 100.00%
+# IBI: 100.00%
+# ** Note: $finish    : /u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/Test1/i3c_tb_primary.sv(143)
+#    Time: 1035 ns  Iteration: 1  Instance: /i3c_tb_primary
+# 1
+# Break in Module i3c_tb_primary at /u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/Test1/i3c_tb_primary.sv line 143
+quit
+# End time: 15:03:29 on Dec 01,2024, Elapsed time: 0:00:25
+# Errors: 0, Warnings: 5
