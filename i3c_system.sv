@@ -101,23 +101,29 @@ module i3c_system (
         .hot_join_ack(1'b0)          // Hot join acknowledgment to master (example)
     );
 
-    i3c_slave i3c_slave_3 (
-        .clk(clk),
-        .reset_n(reset_n),
-        .sda(sda),
-        .scl(scl),
-        .slave_address(7'h32)       // Pre-assigned static address
-    );
+ i2c_slave i2c_slave_1 (
+    .clk(clk),                     // Clock input
+    .reset_n(reset_n),             // Reset signal (active low)
+    .sda(sda),                     // Serial Data Line (bidirectional)
+    .scl(scl),                     // Serial Clock Line
+    .slave_addr(7'h20),           // Static slave address (example)
+    .ibi_request(),                // In-Band Interrupt Request
+    .ibi_data_in(8'h00),           // Data for IBI (example)
+    .lvr_data_out(),               // Legacy Virtual Register Data output
+    .arbitration_lost()            // Flag indicating arbitration loss
+);
 
-    // ----------------------------------------
-    // Instantiating I2C Slave
-    // ----------------------------------------
-    i2c_slave i2c_slave_inst (
-        .clk(clk),
-        .reset_n(reset_n),
-        .sda(sda),
-        .scl(scl),
-        .slave_address(7'h40)       // Pre-assigned static address
-    );
+// You can instantiate more I2C slaves as needed
+i2c_slave i2c_slave_2 (
+    .clk(clk),                     // Clock input
+    .reset_n(reset_n),             // Reset signal (active low)
+    .sda(sda),                     // Serial Data Line (bidirectional)
+    .scl(scl),                     // Serial Clock Line
+    .slave_addr(7'h21),           // Static slave address (example)
+    .ibi_request(),                // In-Band Interrupt Request
+    .ibi_data_in(8'h00),           // Data for IBI (example)
+    .lvr_data_out(),               // Legacy Virtual Register Data output
+    .arbitration_lost()            // Flag indicating arbitration loss
+);   
 
 endmodule
