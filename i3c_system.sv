@@ -57,18 +57,48 @@ module i3c_system (
     // ----------------------------------------
     i3c_slave i3c_slave_1 (
         .clk(clk),
-        .reset_n(reset_n),
-        .sda(sda),
+        .rst_n(reset_n),
         .scl(scl),
-        .slave_address(7'h30)       // Pre-assigned static address
+        .sda_in(sda),                // Connect to shared SDA line
+        .sda_out(),                  // SDA output (driven by slave)
+        .static_addr(8'h30),         // Pre-assigned static address
+        .dynamic_addr(),             // Dynamic address assigned by master
+        .daa_request(),              // DAA request signal from master
+        .daa_addr(),                 // Dynamic address assigned by master
+        .daa_complete(),             // DAA completion flag
+        .ibi_request(),              // IBI request from master
+        .ibi_ack(),                  // IBI acknowledgment
+        .ibi_data(8'h00),            // Data for IBI transfer (example)
+        .command(8'h00),             // Command for directed or global CCCs
+        .tx_data(8'h00),             // Data to be transmitted (for directed transfer)
+        .rx_data(),                  // Data received (for directed transfer)
+        .bcr(),                      // Bus Characteristic Register
+        .dcr(),                      // Device Characteristic Register
+        .hot_join_request(),         // Hot join request signal from slave
+        .hot_join_ack(1'b0)          // Hot join acknowledgment to master (example)
     );
 
     i3c_slave i3c_slave_2 (
         .clk(clk),
-        .reset_n(reset_n),
-        .sda(sda),
+        .rst_n(reset_n),
         .scl(scl),
-        .slave_address(7'h31)       // Pre-assigned static address
+        .sda_in(sda),                // Connect to shared SDA line
+        .sda_out(),                  // SDA output (driven by slave)
+        .static_addr(8'h31),         // Pre-assigned static address
+        .dynamic_addr(),             // Dynamic address assigned by master
+        .daa_request(),              // DAA request signal from master
+        .daa_addr(),                 // Dynamic address assigned by master
+        .daa_complete(),             // DAA completion flag
+        .ibi_request(),              // IBI request from master
+        .ibi_ack(),                  // IBI acknowledgment
+        .ibi_data(8'h00),            // Data for IBI transfer (example)
+        .command(8'h00),             // Command for directed or global CCCs
+        .tx_data(8'h00),             // Data to be transmitted (for directed transfer)
+        .rx_data(),                  // Data received (for directed transfer)
+        .bcr(),                      // Bus Characteristic Register
+        .dcr(),                      // Device Characteristic Register
+        .hot_join_request(),         // Hot join request signal from slave
+        .hot_join_ack(1'b0)          // Hot join acknowledgment to master (example)
     );
 
     i3c_slave i3c_slave_3 (
