@@ -1,91 +1,167 @@
-module i3c_primary_master (
-    input logic clk,
-    input logic rst_n,
-    // I3C Interface
-    inout tri logic scl,
-    inout tri logic sda,
-    // Control and Data Interface
-    input logic start_transfer,
-    input logic [7:0] data_in,
-    output logic [7:0] data_out,
-    output logic busy,
-    output logic ibi_detected
+module i3c_primary_master #(
+    parameter MAX_DEVICES = 8  // Maximum number of devices on the I3C bus
+) (
+    input  logic        clk,         // System clock
+    input  logic        reset_n,     // Active-low reset
+    inout  logic        sda,         // Serial Data Line
+    output logic        scl,         // Serial Clock Line
+
+    output logic        ibi_flag,    // Indicates IBI request received
+    input  logic        ibi_ack      // Acknowledge for IBI
 );
-    // Internal signals
-    logic [7:0] dynamic_address;
-    logic error_flag;
-    logic arbitration_lost;
 
-    // State machine
-    typedef enum logic [2:0] {
-        IDLE,
-        DAA,
-        WRITE,
-        READ,
-        ARBITRATION,
-        ERROR_RECOVERY,
-        HANDLE_IBI
-    } state_t;
-    state_t state, next_state;
+    // ----------------------------------------
+    // Internal Signals
+    // ----------------------------------------
+    typedef struct packed {
+        logic [7:0] static_address;   // Static address
+        logic [6:0] dynamic_address;  // Dynamic address assigned by master
+        logic [7:0] bcr;              // Bus Characteristics Register
+        logic [7:0] dcr;              // Device Characteristics Register
+        logic [7:0] lvr;              // Legacy Virtual Register
+        logic       ibi_requested;    // IBI request flag
+    } device_info_t;
 
-    // State transition
-    always_ff @(posedge clk or negedge rst_n) begin
-        if (!rst_n)
-            state <= IDLE;
-        else
-            state <= next_state;
+    device_info_t devices[MAX_DEVICES];  // Device information array
+    int device_count;                    // Number of devices on the bus
+
+    logic sda_out_en;   // Enable SDA driving
+    logic sda_drive;    // Value to drive on SDA
+    assign sda = sda_out_en ? sda_drive : 1'bz;
+
+    logic scl_drive;    // Clock signal
+    assign scl = scl_drive;
+
+    // ----------------------------------------
+    // Dynamic Address Assignment (DAA)
+    // ----------------------------------------
+    task assign_dynamic_addresses();
+        int i;
+        logic [6:0] dynamic_addr = 7'h10; // Start dynamic address assignment
+        for (i = 0; i < device_count; i++) begin
+            // Send ENTDAA (Enter DAA) CCC command
+            send_ccc_command(8'h07); // 0x07: ENTDAA
+            wait_ack();
+
+            // Capture device response (BCR, DCR, LVR, and static address)
+            devices[i].bcr = receive_data();
+            devices[i].dcr = receive_data();
+            devices[i].lvr = receive_data();
+            devices[i].static_address = receive_data();
+
+            // Assign a dynamic address to the device
+            send_data(dynamic_addr);
+            wait_ack();
+            devices[i].dynamic_address = dynamic_addr;
+            dynamic_addr++;
+        end
+    endtask
+
+    // ----------------------------------------
+    // Collect BCR, DCR, and LVR
+    // ----------------------------------------
+    task collect_device_info();
+        int i;
+        for (i = 0; i < device_count; i++) begin
+            // Use GETCAPS (Get Device Capabilities) CCC to query each device
+            send_ccc_command(8'h08);  // 0x08: GETCAPS
+            send_address(devices[i].dynamic_address, 1'b0); // Write
+            wait_ack();
+
+            devices[i].bcr = receive_data();
+            devices[i].dcr = receive_data();
+            devices[i].lvr = receive_data();
+        end
+    endtask
+
+    // ----------------------------------------
+    // Handle In-Band Interrupt (IBI)
+    // ----------------------------------------
+    always_ff @(posedge clk or negedge reset_n) begin
+        if (!reset_n) begin
+            ibi_flag <= 1'b0;
+        end else begin
+            if (detect_ibi()) begin
+                ibi_flag <= 1'b1;  // Signal an IBI has been received
+                wait(ibi_ack);     // Wait for host to acknowledge IBI
+                ibi_flag <= 1'b0;
+            end
+        end
     end
 
-    // State logic
-    always_comb begin
-        next_state = state;
-        case (state)
-            IDLE: begin
-                busy = 0;
-                ibi_detected = 0;
-                if (start_transfer) next_state = DAA;
-            end
-            DAA: begin
-                busy = 1;
-                next_state = WRITE; // Simulate dynamic address assignment
-            end
-            WRITE: begin
-                busy = 1;
-                next_state = READ; // Simulate data transmission
-            end
-            READ: begin
-                busy = 1;
-                data_out = data_in + 1; // Simulate reception
-                next_state = HANDLE_IBI;
-            end
-            HANDLE_IBI: begin
-                if (sda == 0) begin
-                    ibi_detected = 1; // Simulate IBI detected
-                    next_state = ARBITRATION;
-                end else begin
-                    next_state = IDLE;
-                end
-            end
-            ARBITRATION: begin
-                if (arbitration_lost) begin
-                    error_flag = 1;
-                    next_state = ERROR_RECOVERY;
-                end else begin
-                    error_flag = 0;
-                    next_state = IDLE;
-                end
-            end
-            ERROR_RECOVERY: begin
-                busy = 0;
-                error_flag = 0; // Simulate error recovery
-                next_state = IDLE;
-            end
-            default: next_state = IDLE;
-        endcase
-    end
+    function logic detect_ibi();
+        // Detect IBI request (SDA held low by slave during idle)
+        return (sda == 1'b0 && scl == 1'b1);
+    endfunction
 
-    // Assign tristate signals
-    assign scl = (state == ERROR_RECOVERY) ? 1'bz : scl;
-    assign sda = (state == ERROR_RECOVERY) ? 1'bz : sda;
+    // ----------------------------------------
+    // Send and Receive Data
+    // ----------------------------------------
+    task send_data(input logic [7:0] data);
+        integer i;
+        for (i = 7; i >= 0; i--) begin
+            sda_drive <= data[i];
+            sda_out_en <= 1'b1;
+            @(posedge scl);
+        end
+        sda_out_en <= 1'b0;
+    endtask
+
+    function logic [7:0] receive_data();
+        logic [7:0] data;
+        integer i;
+        for (i = 7; i >= 0; i--) begin
+            @(posedge scl);
+            data[i] <= sda;
+        end
+        return data;
+    endfunction
+
+    task send_address(input logic [6:0] address, input logic rw);
+        logic [7:0] address_byte;
+        address_byte = {address, rw};
+        send_data(address_byte);
+    endtask
+
+    task send_ccc_command(input logic [7:0] command);
+        // Send broadcast or directed CCC
+        send_data(command);
+    endtask
+
+    // ----------------------------------------
+    // Communicate with All Devices (Global CCC)
+    // ----------------------------------------
+    task send_global_ccc(input logic [7:0] ccc_command);
+        send_ccc_command(ccc_command);
+        wait_ack();
+    endtask
+
+    // ----------------------------------------
+    // Communicate with Specific Device (Directed CCC)
+    // ----------------------------------------
+    task send_directed_ccc(input logic [7:0] ccc_command, input logic [6:0] device_addr);
+        send_ccc_command(ccc_command);
+        send_address(device_addr, 1'b0);  // Write
+        wait_ack();
+    endtask
+
+    // ----------------------------------------
+    // Wait for Acknowledge
+    // ----------------------------------------
+    task wait_ack();
+        @(negedge scl); // Wait for ACK bit
+        if (sda != 1'b0) $fatal("ACK not received!");
+    endtask
+
+    // ----------------------------------------
+    // Initialization
+    // ----------------------------------------
+    initial begin
+        device_count = 0;  // Initialize device count
+        @(negedge reset_n);
+        // Assign dynamic addresses and collect device info
+        assign_dynamic_addresses();
+        collect_device_info();
+    end
 
 endmodule
