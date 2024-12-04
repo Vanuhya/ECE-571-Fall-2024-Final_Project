@@ -120,42 +120,8 @@ module i3c_secondary_master #(
         end
     end
 
-    // ----------------------------------------
-    // Master Mode Operation
-    // ----------------------------------------
-    always_ff @(posedge clk or negedge reset_n) begin
-        if (!reset_n) begin
-            device_count <= 0;  // Reset device count
-        end else if (current_state == MASTER_MODE) begin
-            // Assign dynamic addresses and collect device info
-            assign_dynamic_addresses();
-            collect_device_info();
-        end
-    end
 
-    // Dynamic Address Assignment
-    task assign_dynamic_addresses();
-        int i;
-        logic [6:0] dynamic_addr = 7'h10;
-        for (i = 0; i < MAX_DEVICES; i++) begin
-            // Simulate address assignment
-            devices[i].bcr = receive_data();
-            devices[i].dcr = receive_data();
-            devices[i].lvr = receive_data();
-            devices[i].dynamic_address = dynamic_addr;
-            dynamic_addr++;
-        end
-    endtask
 
-    // Collect Device Information
-    task collect_device_info();
-        int i;
-        for (i = 0; i < device_count; i++) begin
-            devices[i].bcr = receive_data();
-            devices[i].dcr = receive_data();
-            devices[i].lvr = receive_data();
-        end
-    endtask
 
     // ----------------------------------------
     // Data Transfer Tasks
@@ -175,15 +141,13 @@ module i3c_secondary_master #(
         sda_out_en <= 1'b0;
     endtask
 
-    function logic [7:0] receive_data();
-        logic [7:0] data;
-        integer i;
-        for (i = 7; i >= 0; i--) begin
-            @(posedge scl);
-            data[i] <= sda;
-        end
-        return data;
-    endfunction
+task receive_data(output logic [7:0] data);
+    integer i;
+    for (i = 7; i >= 0; i--) begin
+        @(posedge scl);
+        data[i] = sda;  // Use blocking assignment in a task
+    end
+endtask
 
     task wait_ack();
         @(negedge scl);
