@@ -80,41 +80,96 @@ module tb_i3c_system;
     end
 
     // Randomized Testing
-    initial begin
-        repeat (300) begin
-            txn = new();
-            assert(txn.randomize()) else $fatal("Transaction randomization failed!");
+      // Declare txn as a static variable outside initial block
+// Temporary variables for force/release
+        logic [7:0] command_tmp;
+        logic ibi_request_tmp;
+        logic [7:0] data_tmp;
 
-            // Display the transaction
-            display_transaction(txn);
 
-            // Apply CCC Command using force/release
-            force dut.i3c_slave_1.command = txn.command;
-            #10 release dut.i3c_slave_1.command;
+initial begin
+    repeat (300) begin
+        txn = new();  // Create a new transaction
+        assert(txn.randomize()) else $fatal("Transaction randomization failed!");
 
-            // Handle IBI using force/release
-            if (txn.ibi_request) begin
-                $display("Time: %0t | IBI requested by Slave 1.", $time);
-                force dut.i3c_slave_1.ibi_request = 1;
-                #10 release dut.i3c_slave_1.ibi_request;
-            end
+        // Display the transaction
+        display_transaction(txn);
 
-            // Write/Read Transactions using force/release
-            if (txn.write_enable) begin
-                force dut.i3c_slave_1.tx_data = txn.data;
-                $display("Time: %0t | Writing Data: 0x%0h to Slave 1.", $time, txn.data);
-                #10 release dut.i3c_slave_1.tx_data;
-            end else begin
-                $display("Time: %0t | Reading Data: 0x%0h from Slave 1.", $time, dut.i3c_slave_1.rx_data);
-            end
+        // Iterate over all devices
+        for (int device_id = 1; device_id <= 4; device_id++) begin
+            // Assign transaction fields to temporary variables
+            command_tmp = txn.command;
+            ibi_request_tmp = txn.ibi_request;
+            data_tmp = txn.data;
 
-            // Sample Functional Coverage
+            case (device_id)
+                1: begin  // I3C Slave 1
+                    $display("Testing I3C Slave 1...");
+                    // Apply CCC Command using force/release
+                    force dut.i3c_slave_1.command = command_tmp;
+                    #10 release dut.i3c_slave_1.command;
+
+                    // Handle IBI
+                    if (ibi_request_tmp) begin
+                        $display("Time: %0t | IBI requested by I3C Slave 1.", $time);
+                        force dut.i3c_slave_1.ibi_request = 1;
+                        #10 release dut.i3c_slave_1.ibi_request;
+                    end
+
+                    // Write/Read Transactions
+                    if (txn.write_enable) begin
+                        force dut.i3c_slave_1.tx_data = data_tmp;
+                        $display("Time: %0t | Writing Data: 0x%0h to I3C Slave 1.", $time, data_tmp);
+                        #10 release dut.i3c_slave_1.tx_data;
+                    end else begin
+                        $display("Time: %0t | Reading Data: 0x%0h from I3C Slave 1.", $time, dut.i3c_slave_1.rx_data);
+                    end
+                end
+
+                2: begin  // I3C Slave 2
+                    $display("Testing I3C Slave 2...");
+                    force dut.i3c_slave_2.command = command_tmp;
+                    #10 release dut.i3c_slave_2.command;
+
+                    if (ibi_request_tmp) begin
+                        $display("Time: %0t | IBI requested by I3C Slave 2.", $time);
+                        force dut.i3c_slave_2.ibi_request = 1;
+                        #10 release dut.i3c_slave_2.ibi_request;
+                    end
+
+                    if (txn.write_enable) begin
+                        force dut.i3c_slave_2.tx_data = data_tmp;
+                        $display("Time: %0t | Writing Data: 0x%0h to I3C Slave 2.", $time, data_tmp);
+                        #10 release dut.i3c_slave_2.tx_data;
+                    end else begin
+                        $display("Time: %0t | Reading Data: 0x%0h from I3C Slave 2.", $time, dut.i3c_slave_2.rx_data);
+                    end
+                end
+
+                3: begin  // I2C Slave
+                    $display("Testing I2C Slave...");
+                    // I2C Slave does not use command or IBI
+                    if (txn.write_enable) begin
+                        force dut.i2c_slave_1.data_reg = data_tmp;
+                        $display("Time: %0t | Writing Data: 0x%0h to I2C Slave.", $time, data_tmp);
+                        #10 release dut.i2c_slave_1.data_reg;
+                    end else begin
+                        $display("Time: %0t | Reading Data: 0x%0h from I2C Slave.", $time, dut.i2c_slave_1.data_reg);
+                    end
+                end
+            endcase
+        end
+    end
+
+
+
+           //Sample Functional Coverage
             dynamic_address_cov.sample();
             ibi_handling_cov.sample();
             ccc_handling_cov.sample();
 
             #20;
-        end
+    
 
         // Display Coverage Results
         $display("Dynamic Address Coverage: %0.2f%%", dynamic_address_cov.get_coverage());
@@ -122,6 +177,5 @@ module tb_i3c_system;
         $display("CCC Handling Coverage: %0.2f%%", ccc_handling_cov.get_coverage());
 
         $finish;
-    end
-
+end
 endmodule
