@@ -13,7 +13,7 @@ module i3c_system (
     // Internal Signals
     // ----------------------------------------
     logic ibi_ack_master;
-    logic ibi_ack_slave_1, ibi_ack_slave_2;
+    wire logic ibi_ack_slave_1, ibi_ack_slave_2;
     logic ibi_ack_signal;  // Combined IBI acknowledgment signal
 
     // ----------------------------------------
@@ -33,7 +33,7 @@ module i3c_system (
     // ----------------------------------------
     // Instantiating I3C Secondary Master/Slave Instances
     // ----------------------------------------
-    i3c_secondary_master_slave secondary_master_1 (
+    i3c_secondary_master secondary_master_1 (
         .clk(clk),
         .reset_n(reset_n),
         .sda(sda),           // Use tri-state shared bus
@@ -45,7 +45,7 @@ module i3c_system (
         .slave_address(7'h20)       // Pre-assigned static address
     );
 
-    i3c_secondary_master_slave secondary_master_2 (
+    i3c_secondary_master secondary_master_2 (
         .clk(clk),
         .reset_n(reset_n),
         .sda(sda),           // Use tri-state shared bus
@@ -105,6 +105,41 @@ module i3c_system (
         .hot_join_request(),  // Hot join request
         .hot_join_ack(1'b0)   // Hot join acknowledgment (default)
     );
+    i3c_slave i3c_slave_3 (
+        .clk(clk),
+        .rst_n(reset_n),
+        .scl(scl),
+        .sda_in(sda),         // Connect to shared SDA line
+        .sda_out(),           // SDA output (driven by slave)
+        .static_addr(8'h31),  // Pre-assigned static address
+        .dynamic_addr(),      // Dynamic address assigned by master
+        .daa_request(),       // DAA request signal from master
+        .daa_addr(),          // Dynamic address assigned by master
+        .daa_complete(),      // DAA completion flag
+        .ibi_request(),       // IBI request from master
+        .ibi_ack(ibi_ack_slave_2), // Directly drive the slave acknowledgment signal
+        .ibi_data(8'h00),     // IBI data register (dummy for this example)
+        .command(8'h00),      // CCC command
+        .tx_data(8'h00),      // Data to transmit
+        .rx_data(),           // Data received
+        .bcr(),               // Bus control register
+        .dcr(),               // Device control register
+        .hot_join_request(),  // Hot join request
+        .hot_join_ack(1'b0)   // Hot join acknowledgment (default)
+    );
+
+i2c_slave i2c_slave_1 (
+    .clk(clk),                    // System clock
+    .reset_n(reset_n),            // Active-low reset
+    .sda(sda),                    // Shared tri-state serial data line
+    .scl(scl),                    // Shared tri-state serial clock line
+    .slave_addr(7'h40),           // Static slave address for I2C
+    .ibi_request(),               // IBI not used in I2C; leave unconnected
+    .ibi_data_in(8'h00),          // IBI data input (not applicable for I2C)
+    .lvr_data_out(),              // Optional output for LVR (Legacy Virtual Register)
+    .arbitration_lost()           // Output indicating arbitration loss
+);
+
 
     // ----------------------------------------
     // Combine Acknowledgment Signals
