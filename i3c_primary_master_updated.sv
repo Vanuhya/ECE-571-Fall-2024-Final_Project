@@ -163,4 +163,3 @@ module i3c_primary_master #(
     end
 
 endmodule
-
