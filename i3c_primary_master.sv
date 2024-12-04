@@ -37,17 +37,23 @@ module i3c_primary_master #(
     // ----------------------------------------
     task assign_dynamic_addresses();
         int i;
-        logic [6:0] dynamic_addr = 7'h10; // Start dynamic address assignment
+        logic [6:0] dynamic_addr; 
+        logic [7:0] bcr1,dcr1,lvr1, static_address1;
+        dynamic_addr = 7'h10; // Start dynamic address assignment
         for (i = 0; i < device_count; i++) begin
             // Send ENTDAA (Enter DAA) CCC command
             send_ccc_command(8'h07); // 0x07: ENTDAA
             wait_ack();
 
             // Capture device response (BCR, DCR, LVR, and static address)
-            devices[i].bcr = receive_data();
-            devices[i].dcr = receive_data();
-            devices[i].lvr = receive_data();
-            devices[i].static_address = receive_data();
+            receive_data(bcr1);
+            devices[i].bcr = bcr1;
+            receive_data(dcr1);
+            devices[i].dcr = dcr1;
+            receive_data(lvr1);
+            devices[i].lvr = lvr1;
+            receive_data(static_address1);
+            devices[i].static_address = static_address1;
 
             // Assign a dynamic address to the device
             send_data(dynamic_addr);
@@ -62,32 +68,43 @@ module i3c_primary_master #(
     // ----------------------------------------
     task collect_device_info();
         int i;
+        logic [7:0] bcr1,dcr1,lvr1;
         for (i = 0; i < device_count; i++) begin
             // Use GETCAPS (Get Device Capabilities) CCC to query each device
             send_ccc_command(8'h08);  // 0x08: GETCAPS
             send_address(devices[i].dynamic_address, 1'b0); // Write
             wait_ack();
 
-            devices[i].bcr = receive_data();
-            devices[i].dcr = receive_data();
-            devices[i].lvr = receive_data();
+            
+            receive_data(bcr1);
+            devices[i].bcr = bcr1;
+            receive_data(dcr1);
+            devices[i].dcr = dcr1;
+            receive_data(lvr1);
+            devices[i].lvr = lvr1;
         end
     endtask
 
     // ----------------------------------------
     // Handle In-Band Interrupt (IBI)
     // ----------------------------------------
-    always_ff @(posedge clk or negedge reset_n) begin
-        if (!reset_n) begin
-            ibi_flag <= 1'b0;
-        end else begin
-            if (detect_ibi()) begin
-                ibi_flag <= 1'b1;  // Signal an IBI has been received
-                wait(ibi_ack);     // Wait for host to acknowledge IBI
-                ibi_flag <= 1'b0;
-            end
+logic ibi_pending;  // New signal to indicate IBI is waiting for acknowledgment
+
+always_ff @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        ibi_flag <= 1'b0;
+        ibi_pending <= 1'b0;
+    end else begin
+        if (detect_ibi()) begin
+            ibi_flag <= 1'b1;  // Signal an IBI has been received
+            ibi_pending <= 1'b1;  // Indicate IBI is awaiting acknowledgment
+        end
+        if (ibi_ack && ibi_pending) begin
+            ibi_flag <= 1'b0;  // Clear IBI flag once acknowledged
+            ibi_pending <= 1'b0;  // Reset pending status
         end
     end
+end
 
     function logic detect_ibi();
         // Detect IBI request (SDA held low by slave during idle)
@@ -107,15 +124,13 @@ module i3c_primary_master #(
         sda_out_en <= 1'b0;
     endtask
 
-    function logic [7:0] receive_data();
-        logic [7:0] data;
-        integer i;
-        for (i = 7; i >= 0; i--) begin
-            @(posedge scl);
-            data[i] <= sda;
-        end
-        return data;
-    endfunction
+task receive_data(output logic [7:0] data);
+    integer i;
+    for (i = 7; i >= 0; i--) begin
+        @(posedge scl);
+        data[i] = sda;  // Blocking assignment is used in tasks
+    end
+endtask
 
     task send_address(input logic [6:0] address, input logic rw);
         logic [7:0] address_byte;
