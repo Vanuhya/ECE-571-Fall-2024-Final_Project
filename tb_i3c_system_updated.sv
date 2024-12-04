@@ -1,140 +1,127 @@
-
-`include "i2c_slave.sv"
-`include "i3c_secondary_master.sv"
-`include "i3c_slave1.sv"
-`include "i3c_system.sv"
-
-module i3c_testbench;
+module tb_i3c_system;
 
     // Clock and Reset
-    logic clk;
-    logic reset_n;
+    logic clk, rst_n;
 
-    // Bus signals
-    logic sda;
-    logic scl;
+    // Shared Bus Signals
+    tri logic sda; // Serial Data Line (shared bus)
+    tri logic scl; // Serial Clock Line (shared bus)
 
-    // IBI signals
-    logic ibi_flag;
-    logic ibi_ack;
-
-    // DUT: I3C Primary Master
-    i3c_primary_master #(.MAX_DEVICES(8)) dut (
+    // DUT Instance
+    i3c_system dut (
         .clk(clk),
-        .reset_n(reset_n),
-        .sda(sda),
-        .scl(scl),
-        .ibi_flag(ibi_flag),
-        .ibi_ack(ibi_ack)
+        .reset_n(rst_n)
     );
 
-    // Testbench Components
-    i3c_driver driver;            // Driver object
-    i3c_monitor monitor;          // Monitor object
-    i3c_scoreboard scoreboard;    // Scoreboard object
-    i3c_transaction tr;           // Transaction object
+    // Clock Generation
+    always #5 clk = ~clk;
 
-    // Covergroup for Functional Coverage
-    covergroup cg_transaction;
-        coverpoint tr.device_address;
-        coverpoint tr.data;
-        coverpoint tr.write;
-        coverpoint tr.ccc;
+    // Randomized Transaction Class
+    class i3c_transaction;
+        rand logic [7:0] data;              // Data to be sent/received
+        rand logic [6:0] static_address;   // Static address of I3C devices
+        rand logic [7:0] command;          // CCC command
+        rand bit request_mastership;       // Request for mastership
+        rand bit ibi_request;              // In-band interrupt request
+        rand bit write_enable;             // Write enable signal
+
+        // Constraints for meaningful transactions
+        constraint valid_data { data inside {[8'h00:8'hFF]}; }
+        constraint valid_static_address { static_address inside {[7'h08:7'h7F]}; }
+        constraint ibi_probability { ibi_request dist {1 := 60, 0 := 40}; } // IBI request ~60% of the time
+    endclass
+
+    i3c_transaction txn;
+
+    // Functional Coverage
+    covergroup cg_dynamic_address @(posedge clk);
+        coverpoint dut.primary_master.devices[0].dynamic_address {
+            bins valid_dynamic_addresses[] = {[7'h10:7'h7F]};
+            bins edge_cases[] = {7'h10, 7'h7F};
+        }
     endgroup
+    cg_dynamic_address dynamic_address_cov;
 
-    cg_transaction cg;
+    covergroup cg_ibi_handling @(posedge clk);
+        coverpoint dut.primary_master.ibi_flag {
+            bins ibi_detected = {1};
+            bins ibi_not_detected = {0};
+        }
+    endgroup
+    cg_ibi_handling ibi_handling_cov;
 
-    // Clock Generator
+    covergroup cg_ccc_handling @(posedge clk);
+        coverpoint dut.i3c_slave_1.command {
+            bins ccc_valid_commands[] = {[8'h07:8'h0F]};
+        }
+    endgroup
+    cg_ccc_handling ccc_handling_cov;
+
+    // Display Transactions
+    task display_transaction(i3c_transaction txn);
+        $display(
+            "Time: %0t | Data: 0x%0h | Static Addr: 0x%0h | Command: 0x%0h | IBI: %b | Mastership: %b | Write: %b",
+            $time, txn.data, txn.static_address, txn.command, txn.ibi_request, txn.request_mastership, txn.write_enable
+        );
+    endtask
+
+    // Test Initialization
     initial begin
         clk = 0;
-        forever #5 clk = ~clk; // 100 MHz clock
+        rst_n = 0;
+
+        dynamic_address_cov = new();
+        ibi_handling_cov = new();
+        ccc_handling_cov = new();
+
+        // Reset the DUT
+        #20 rst_n = 1;
+        $display("Simulation started: Reset released.");
     end
 
-    // Reset Generator
+    // Randomized Testing
     initial begin
-        reset_n = 0;
-        #50 reset_n = 1;
-    end
+        repeat (300) begin
+            txn = new();
+            assert(txn.randomize()) else $fatal("Transaction randomization failed!");
 
-    // Main Test Sequence
-    initial begin
-        // Instantiate Testbench Components using `new`
-        $display("Instantiating Testbench Components...");
-        i3c_driver = new();          // Initialize driver
-        i3c_monitor = new();         // Initialize monitor
-        i3c_scoreboard = new();      // Initialize scoreboard
-        tr = new();              // Initialize transaction object
-        cg = new();              // Initialize covergroup
+            // Display the transaction
+            display_transaction(txn);
 
-        // Wait for reset
-        @(posedge reset_n);
-        $display("Reset Released. Starting Test...");
+            // Apply CCC Command using force/release
+            force dut.i3c_slave_1.command = txn.command;
+            #10 release dut.i3c_slave_1.command;
 
-        // Generate Transactions
-        for (int i = 0; i < 100; i++) begin
-            assert(tr.randomize()) else $fatal("Transaction randomization failed!");
+            // Handle IBI using force/release
+            if (txn.ibi_request) begin
+                $display("Time: %0t | IBI requested by Slave 1.", $time);
+                force dut.i3c_slave_1.ibi_request = 1;
+                #10 release dut.i3c_slave_1.ibi_request;
+            end
 
-            // Log generated transaction
-            $display("Generated Transaction: Addr=0x%0h, Data=0x%0h, Write=%0b, CCC=%0b",
-                     tr.device_address, tr.data, tr.write, tr.ccc);
+            // Write/Read Transactions using force/release
+            if (txn.write_enable) begin
+                force dut.i3c_slave_1.tx_data = txn.data;
+                $display("Time: %0t | Writing Data: 0x%0h to Slave 1.", $time, txn.data);
+                #10 release dut.i3c_slave_1.tx_data;
+            end else begin
+                $display("Time: %0t | Reading Data: 0x%0h from Slave 1.", $time, dut.i3c_slave_1.rx_data);
+            end
 
-            // Drive transaction to DUT
-            driver.drive_transaction(tr);
+            // Sample Functional Coverage
+            dynamic_address_cov.sample();
+            ibi_handling_cov.sample();
+            ccc_handling_cov.sample();
 
-            // Sample coverage
-            cg.sample();
-
-            // Verify transaction
-            scoreboard.check(tr);
+            #20;
         end
 
-        // Display coverage summary (manually tracking coverage in this case)
-        $display("Coverage Summary:");
-        cg.display();
+        // Display Coverage Results
+        $display("Dynamic Address Coverage: %0.2f%%", dynamic_address_cov.get_coverage());
+        $display("IBI Handling Coverage: %0.2f%%", ibi_handling_cov.get_coverage());
+        $display("CCC Handling Coverage: %0.2f%%", ccc_handling_cov.get_coverage());
 
-        // End simulation
-        $display("Simulation Complete.");
-        $stop;
+        $finish;
     end
 
 endmodule
-
-// ----------------------------------------
-// Classes
-// ----------------------------------------
-
-class i3c_transaction;
-    rand logic [6:0] device_address;
-    rand logic [7:0] data;
-    rand bit write; // 1 for write, 0 for read
-    rand bit ccc;   // Indicates if this is a CCC command
-
-    constraint valid_address {
-        device_address inside {[7'h10:7'h7F]};
-    }
-endclass
-
-class i3c_driver;
-    task drive_transaction(i3c_transaction tr);
-        // Drive SDA and SCL for the transaction
-        // Placeholder: Replace with actual bus signaling logic
-        $display("Driving Transaction: Addr=0x%0h, Data=0x%0h, Write=%0b, CCC=%0b",
-                 tr.device_address, tr.data, tr.write, tr.ccc);
-    endtask
-endclass
-
-class i3c_monitor;
-    task capture_transaction();
-        // Monitor and log transactions
-        // Placeholder: Replace with bus monitoring logic
-        $display("Monitoring Transaction: Placeholder logic.");
-    endtask
-endclass
-
-class i3c_scoreboard;
-    function void check(i3c_transaction tr);
-        // Verify DUT behavior matches expected results
-        $display("Checking Transaction: Addr=0x%0h, Data=0x%0h, Write=%0b, CCC=%0b",
-                 tr.device_address, tr.data, tr.write, tr.ccc);
-    endfunction
-endclass
