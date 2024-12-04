@@ -204,4 +204,3 @@ module i3c_secondary_master #(
     endtask
 
 endmodule
-
