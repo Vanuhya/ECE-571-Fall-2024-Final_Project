@@ -1,0 +1,190 @@
+m255
+K4
+z2
+!s99 nomlopt
+!s11f vlog 2021.3_1 2021.08, Aug 15 2021
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 d/u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test
+T_opt
+!s110 1733341109
+V7Ge052T8nS<OfgTLnD08J2
+04 13 4 work tb_i3c_system fast 0
+=1-525400b63b2a-6750afb4-87df2-11fb
+!s124 OEM100
+o-quiet -auto_acc_if_foreign -work work +acc
+Z1 tCvgOpt 0
+n@_opt
+OL;O;2021.3_1;73
+vi2c_slave
+Z2 DXx6 sv_std 3 std 0 22 9oUSJO;AeEaW`l:M@^WG92
+Z3 !s110 1733341100
+!i10b 1
+!s100 VXd:;oH>9@elb6LCGQIcP1
+I`j>Y>GY6KIR]LSdn_]0Km1
+S1
+R0
+Z4 w1733341052
+Z5 8/u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/i2c_slave.sv
+Z6 F/u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/i2c_slave.sv
+!i122 4
+L0 2 177
+Z7 VDg1SIo80bB@j0V0VzS_@n1
+Z8 OL;L;2021.3_1;73
+r1
+!s85 0
+31
+Z9 !s108 1733341100.000000
+Z10 !s107 /u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/i2c_slave.sv|
+Z11 !s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/i2c_slave.sv|
+!i113 0
+Z12 o-work work -sv -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R1
+vi3c_primary_master
+R2
+R3
+!i10b 1
+!s100 4_A49Z3WWo@5h_Eh>E^]I0
+I_a2Fh4c8;:XfV__I:;bGJ0
+S1
+R0
+w1733338692
+8/u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/i3c_primary_master.sv
+F/u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/i3c_primary_master.sv
+!i122 5
+L0 1 182
+R7
+R8
+r1
+!s85 0
+31
+R9
+!s107 /u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/i3c_primary_master.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/i3c_primary_master.sv|
+!i113 0
+R12
+R1
+vi3c_secondary_master
+R2
+R3
+!i10b 1
+!s100 ^[Y;?HgLAXLKSMgO<1J^83
+IhC@_?lihF>R8Wz]l?A^?<3
+S1
+R0
+w1733338456
+8/u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/I3C_secondary master and slave_module.sv
+F/u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/I3C_secondary master and slave_module.sv
+!i122 6
+L0 1 157
+R7
+R8
+r1
+!s85 0
+31
+R9
+!s107 /u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/I3C_secondary master and slave_module.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/I3C_secondary master and slave_module.sv|
+!i113 0
+R12
+R1
+vi3c_slave
+R2
+Z13 !s110 1733341101
+!i10b 1
+!s100 PdGhb<AGOPc^V=gS[e59z0
+I4QD7JLflRnC@nkR_`UcO=1
+S1
+R0
+w1733338625
+8/u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/I3C_slave1.sv
+F/u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/I3C_slave1.sv
+!i122 7
+L0 1 162
+R7
+R8
+r1
+!s85 0
+31
+R9
+!s107 /u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/I3C_slave1.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/I3C_slave1.sv|
+!i113 0
+R12
+R1
+vi3c_system
+R2
+R13
+!i10b 1
+!s100 [7fPAG_^cIYzL<99LDE@T3
+IXg?1bWh<R9bNlG?=J3U_G0
+S1
+R0
+w1733341093
+8/u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/i3c_system.sv
+F/u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/i3c_system.sv
+!i122 8
+L0 2 149
+R7
+R8
+r1
+!s85 0
+31
+Z14 !s108 1733341101.000000
+!s107 /u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/i3c_system.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/i3c_system.sv|
+!i113 0
+R12
+R1
+vspike_filter
+R2
+R3
+!i10b 1
+!s100 jg1>]3i18oTjNE_`_LH_Q2
+I?_BbG6U2X4d@BM7JhL76P2
+S1
+R0
+R4
+R5
+R6
+!i122 4
+L0 181 24
+R7
+R8
+r1
+!s85 0
+31
+R9
+R10
+R11
+!i113 0
+R12
+R1
+vtb_i3c_system
+R2
+R13
+!i10b 1
+!s100 Z6^b=JZ^;PYXY<Y?hBC2]2
+I]?bUFf;RmmKZ9_L7X@:dX3
+S1
+R0
+w1733340613
+8/u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/tb_i3c_system_updated.sv
+F/u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/tb_i3c_system_updated.sv
+!i122 9
+L0 1 181
+R7
+R8
+r1
+!s85 0
+31
+R14
+!s107 /u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/tb_i3c_system_updated.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/tb_i3c_system_updated.sv|
+!i113 0
+R12
+R1

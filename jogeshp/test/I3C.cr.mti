@@ -1,0 +1,44 @@
+{/u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/I3C_secondary master and slave_module.sv} {1 {vlog -work work -vopt -sv -stats=none {/u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/I3C_secondary master and slave_module.sv}
+QuestaSim-64 vlog 2021.3_1 Compiler 2021.08 Aug 15 2021
+-- Compiling module i3c_secondary_master
+
+Top level modules:
+	i3c_secondary_master
+
+} {} {}} /u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/i3c_primary_master.sv {1 {vlog -work work -vopt -sv -stats=none /u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/i3c_primary_master.sv
+QuestaSim-64 vlog 2021.3_1 Compiler 2021.08 Aug 15 2021
+-- Compiling module i3c_primary_master
+
+Top level modules:
+	i3c_primary_master
+
+} {} {}} /u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/tb_i3c_system_updated.sv {1 {vlog -work work -vopt -sv -stats=none /u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/tb_i3c_system_updated.sv
+QuestaSim-64 vlog 2021.3_1 Compiler 2021.08 Aug 15 2021
+-- Compiling module tb_i3c_system
+
+Top level modules:
+	tb_i3c_system
+
+} {} {}} /u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/I3C_slave1.sv {1 {vlog -work work -vopt -sv -stats=none /u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/I3C_slave1.sv
+QuestaSim-64 vlog 2021.3_1 Compiler 2021.08 Aug 15 2021
+-- Compiling module i3c_slave
+
+Top level modules:
+	i3c_slave
+
+} {} {}} /u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/i3c_system.sv {1 {vlog -work work -vopt -sv -stats=none /u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/i3c_system.sv
+QuestaSim-64 vlog 2021.3_1 Compiler 2021.08 Aug 15 2021
+-- Compiling module i3c_system
+
+Top level modules:
+	i3c_system
+
+} {} {}} /u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/i2c_slave.sv {1 {vlog -work work -vopt -sv -stats=none /u/jogeshp/ECE-571-Fall-2024-Final_Project/jogeshp/test/i2c_slave.sv
+QuestaSim-64 vlog 2021.3_1 Compiler 2021.08 Aug 15 2021
+-- Compiling module i2c_slave
+-- Compiling module spike_filter
+
+Top level modules:
+	i2c_slave
+
+} {} {}}
